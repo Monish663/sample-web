@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>StudyHub — Union Catalog for Course Notes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231b2740'/%3E%3Ctext x='32' y='41' font-family='Georgia,serif' font-size='26' font-weight='700' fill='%23c99a2e' text-anchor='middle'%3ESH%3C/text%3E%3C/svg%3E" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ===================== HEADER ===================== -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-mark">SH</div>
+      <div class="brand-text">
+        <span class="brand-title">StudyHub</span>
+        <span class="brand-sub">Union Catalog of Course Notes &middot; Est. This Semester</span>
+      </div>
+    </div>
+
+    <nav class="main-nav">
+      <button class="nav-link active" data-view="library">Library</button>
+      <button class="nav-link" data-view="trending">Trending</button>
+      <button class="nav-link" data-view="contributors">Contributors</button>
+    </nav>
+
+    <div class="header-actions">
+      <button class="user-chip" id="userChip" title="Switch identity">
+        <span class="user-dot" id="userDot">?</span>
+        <span id="userChipName">Guest</span>
+      </button>
+      <button class="btn btn-stamp" id="openUploadBtn">+ File a Resource</button>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <div class="hero-texture" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <div class="hero-text">
+      <span class="eyebrow">Union Catalog &middot; No login walls, just credit where it's due</span>
+      <h1>Every good note your batch ever made, filed in one place instead of buried in a chat.</h1>
+      <p class="hero-lede">Question papers, unit notes, and "someone please send the link" messages — gone by the end of finals week. StudyHub keeps them searchable by department, semester, and subject, long after the group chat has scrolled past them.</p>
+      <div class="hero-cta">
+        <button class="btn btn-stamp btn-lg" id="heroUploadBtn">+ File a Resource</button>
+        <button class="btn btn-ghost btn-lg" id="heroBrowseBtn">Browse the catalog ↓</button>
+      </div>
+      <div class="hero-stats" id="heroStats">
+        <div class="stat-chip">
+          <span class="stat-num" id="statResources">0</span>
+          <span class="stat-label">Resources filed</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-num" id="statContributors">0</span>
+          <span class="stat-label">Contributors</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-num" id="statDepts">0</span>
+          <span class="stat-label">Departments live</span>
+        </div>
+        <div class="stat-chip">
+          <span class="stat-num" id="statWeek">0</span>
+          <span class="stat-label">Filed this week</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="hero-stack" id="heroStack"></div>
+    </div>
+  </div>
+</section>
+
+<div class="ornament-divider"><span></span></div>
+
+<!-- ===================== CATALOG DRAWER (FILTER BAR) ===================== -->
+<section class="drawer view-section" id="drawerSection">
+  <div class="drawer-inner">
+    <div class="drawer-row drawer-row-depts">
+      <span class="drawer-label">Department</span>
+      <div class="tab-row" id="deptTabs"></div>
+    </div>
+    <div class="drawer-row drawer-row-filters">
+      <div class="field">
+        <label for="semesterSelect">Semester</label>
+        <select id="semesterSelect">
+          <option value="">All semesters</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="subjectInput">Subject</label>
+        <input type="text" id="subjectInput" placeholder="e.g. Data Structures" />
+      </div>
+      <div class="field field-grow">
+        <label for="searchInput">Search</label>
+        <div class="search-wrap">
+          <svg class="icon search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="searchInput" placeholder="Search title, description, uploader, tag..." />
+        </div>
+      </div>
+      <div class="field">
+        <label for="sortSelect">Sort</label>
+        <select id="sortSelect">
+          <option value="newest">Newest first</option>
+          <option value="upvotes">Most upvoted</option>
+          <option value="trending">Trending score</option>
+          <option value="title">Title A–Z</option>
+        </select>
+      </div>
+      <button class="btn btn-ghost" id="clearFiltersBtn">Clear filters</button>
+    </div>
+    <div class="drawer-row tag-cloud-row">
+      <span class="drawer-label">Tags</span>
+      <div class="tag-cloud" id="tagCloud"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TRENDING SHELF ===================== -->
+<section class="shelf-section view-section" id="trendingSection">
+  <div class="shelf-heading">
+    <h2>Trending this week</h2>
+    <p>Cards getting the most stamps of approval in the last 7 days.</p>
+  </div>
+  <div class="shelf-track" id="trendingTrack"></div>
+</section>
+
+<div class="ornament-divider"><span></span></div>
+
+<!-- ===================== MAIN LIBRARY ===================== -->
+<main class="library-section view-section">
+  <div class="library-heading">
+    <h2 id="libraryHeading">Full catalog</h2>
+    <span class="result-count" id="resultCount">0 cards</span>
+  </div>
+  <div class="catalog-grid" id="catalogGrid"></div>
+  <div class="empty-state" id="emptyState" hidden>
+    <div class="empty-card">
+      <p class="empty-title">This drawer's empty.</p>
+      <p class="empty-copy">No cards match your filters. Try clearing them, or be the first to file one for this shelf.</p>
+      <button class="btn btn-stamp" id="emptyUploadBtn">+ File a Resource</button>
+    </div>
+  </div>
+</main>
+
+<!-- ===================== CONTRIBUTORS VIEW ===================== -->
+<section class="contributors-section view-section" id="contributorsSection" hidden>
+  <div class="library-heading">
+    <h2>Contributors ledger</h2>
+    <span class="result-count">Ranked by reputation</span>
+  </div>
+  <table class="ledger-table">
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Contributor</th>
+        <th>Badge</th>
+        <th>Uploads</th>
+        <th>Upvotes received</th>
+        <th>Reputation</th>
+      </tr>
+    </thead>
+    <tbody id="ledgerBody"></tbody>
+  </table>
+</section>
+
+<!-- ===================== UPLOAD MODAL ===================== -->
+<div class="modal-overlay" id="uploadOverlay" hidden>
+  <div class="modal upload-modal">
+    <button class="modal-close" data-close="uploadOverlay">&times;</button>
+    <h3 class="modal-title">File a new resource</h3>
+    <p class="modal-sub">Every field becomes a line on the catalog card. Fill it like you're labeling it for someone else.</p>
+
+    <div class="dup-warning" id="dupWarning" hidden>
+      <strong>Possible duplicate spotted.</strong>
+      <p id="dupWarningText"></p>
+      <div class="dup-actions">
+        <button class="btn btn-ghost" id="viewDupBtn" type="button">View existing card</button>
+        <button class="btn btn-ghost" id="dismissDupBtn" type="button">This is different — continue</button>
+      </div>
+    </div>
+
+    <form id="uploadForm">
+      <div class="form-grid">
+        <div class="field">
+          <label for="f-title">Title</label>
+          <input type="text" id="f-title" required placeholder="e.g. Unit 3 — Normalization &amp; ER Diagrams" />
+        </div>
+        <div class="field">
+          <label for="f-uploader">Your name</label>
+          <input type="text" id="f-uploader" required placeholder="How should we credit you?" />
+        </div>
+        <div class="field">
+          <label for="f-dept">Department</label>
+          <select id="f-dept" required></select>
+        </div>
+        <div class="field">
+          <label for="f-sem">Semester</label>
+          <select id="f-sem" required></select>
+        </div>
+        <div class="field">
+          <label for="f-subject">Subject</label>
+          <input type="text" id="f-subject" required placeholder="e.g. DBMS" />
+        </div>
+        <div class="field">
+          <label for="f-type">Resource type</label>
+          <select id="f-type">
+            <option>Notes</option>
+            <option>Question Paper</option>
+            <option>Reference Link</option>
+            <option>Lab Manual</option>
+            <option>Cheat Sheet</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="field field-full">
+          <label for="f-desc">Description</label>
+          <textarea id="f-desc" rows="3" placeholder="What's in this file? Which topics, which exam year, anything special?"></textarea>
+        </div>
+        <div class="field field-full">
+          <label for="f-tags">Tags <span class="hint">(comma separated)</span></label>
+          <input type="text" id="f-tags" placeholder="e.g. midterm, sql, er-diagram" />
+        </div>
+        <div class="field field-full">
+          <label for="f-link">Reference link <span class="hint">(optional, instead of / alongside a file)</span></label>
+          <input type="url" id="f-link" placeholder="https://..." />
+        </div>
+        <div class="field field-full">
+          <label>File <span class="hint">(optional if a link is given &middot; kept under 3&nbsp;MB for this demo)</span></label>
+          <div class="dropzone" id="dropzone">
+            <p id="dropzoneText">Drag a file here, or click to choose one</p>
+            <input type="file" id="f-file" hidden />
+          </div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-ghost" data-close="uploadOverlay">Cancel</button>
+        <button type="submit" class="btn btn-stamp">Stamp &amp; file this card</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== DETAIL MODAL ===================== -->
+<div class="modal-overlay" id="detailOverlay" hidden>
+  <div class="modal detail-modal" id="detailModal"></div>
+</div>
+
+<!-- ===================== IDENTITY MODAL ===================== -->
+<div class="modal-overlay" id="identityOverlay" hidden>
+  <div class="modal identity-modal">
+    <button class="modal-close" data-close="identityOverlay">&times;</button>
+    <h3 class="modal-title">Who's filing today?</h3>
+    <p class="modal-sub">No password, no account wall — just tell us your name so uploads and upvotes are credited to you.</p>
+    <div class="field">
+      <label for="identityInput">Display name</label>
+      <input type="text" id="identityInput" placeholder="e.g. Ananya R" />
+    </div>
+    <div class="form-actions">
+      <button class="btn btn-stamp" id="saveIdentityBtn">Save &amp; continue</button>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <p>StudyHub — built by students, for the next batch of students. Everything here lives in your browser's local storage.</p>
+</footer>
+
+<button class="back-to-top" id="backToTop" title="Back to top" hidden>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<script src="script.js"></script>
+</body>
+</html>
